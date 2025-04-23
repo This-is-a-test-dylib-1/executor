@@ -10,15 +10,13 @@ If you're experiencing issues with CodeMagic builds, such as the "Invalid encryp
 - Potentially lower costs
 - Elimination of team-specific encryption key issues
 
-## Robust Build Approach
+## Simplified Approach
 
-This migration implements a robust build process:
-- Multiple build methods (Makefile and script) for reliability
-- Proper IPA file structure creation
-- IPA verification steps
+This migration takes a simplified approach:
 - No code signing required (builds for simulator)
 - No GitHub secrets needed (values hardcoded)
 - No TestFlight deployment (artifact only)
+- Simple IPA creation (zip file of the app)
 
 ## Migration Steps
 
@@ -27,7 +25,7 @@ This migration implements a robust build process:
 The migration includes several build tools:
 
 1. **Makefile** (`Makefile.ios`): Provides a structured build process with various targets
-2. **Build Script** (`scripts/build_ipa.sh`): Offers an alternative build method
+2. **Build Script** (`build-ios.sh`): Offers a simplified way to run the Makefile
 3. **GitHub Actions Workflow** (`.github/workflows/ios-app-build.yml`): Orchestrates the build process
 
 ### 2. Remove CodeMagic Configuration
@@ -67,21 +65,21 @@ The `Makefile.ios` includes several useful targets:
 
 ### Build Script
 
-The `scripts/build_ipa.sh` script:
+The `build-ios.sh` script:
 
-1. Builds the app for iOS simulator
-2. Creates a proper IPA file structure with Payload directory
-3. Adds required metadata
-4. Packages everything into an IPA file
-5. Verifies the build
+1. Checks if Xcode is installed
+2. Verifies the Xcode project exists
+3. Runs the Makefile targets in sequence
+4. Verifies the IPA was created successfully
+5. Provides detailed output and error handling
 
 ### GitHub Actions Workflow
 
 The workflow:
 
 1. Sets up the macOS build environment
-2. Tries building with the Makefile
-3. Falls back to the build script if needed
+2. Makes the build script executable
+3. Runs the build script
 4. Verifies the IPA file structure
 5. Uploads the build as a GitHub Actions artifact
 
@@ -100,6 +98,7 @@ If the build fails:
 Note that building for the simulator has some limitations:
 - The app will only run on iOS simulators, not real devices
 - Some device-specific features may not work in the simulator
+- The IPA is not a standard IPA file but a zip of the app bundle
 
 ## Future Enhancements
 
